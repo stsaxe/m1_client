@@ -4,14 +4,14 @@ import {Spinner} from 'components/ui/Spinner';
 import {Button} from 'components/ui/Button';
 import {useHistory} from 'react-router-dom';
 import BaseContainer from "components/ui/BaseContainer";
+import UserList from "components/ui/UserList";
 import PropTypes from "prop-types";
-import "styles/views/Game.scss";
+import { Link } from 'react-router-dom';
+//import "styles/views/Game.scss";
 
 const Player = ({user}) => (
   <div className="player container">
     <div className="player username">{user.username}</div>
-    <div className="player name">{user.name}</div>
-    <div className="player id">id: {user.id}</div>
   </div>
 );
 
@@ -30,9 +30,19 @@ const Game = () => {
   // more information can be found under https://reactjs.org/docs/hooks-state.html
   const [users, setUsers] = useState(null);
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    history.push('/login');
+  const logout = async () => {
+      try {
+          const userID = localStorage.getItem('userID');
+          const response = await api.post('/users/logout/' + userID);
+          localStorage.removeItem('token');
+
+
+          history.push('/login');
+      } catch (error) {
+          alert(`Something went wrong when trying to logout: \n${handleError(error)}`);
+          localStorage.removeItem('token');
+          history.push('/login');
+      }
   }
 
   // the effect hook can be used to react to change in your component.
@@ -48,7 +58,7 @@ const Game = () => {
         // delays continuous execution of an async operation for 1 second.
         // This is just a fake async call, so that the spinner can be displayed
         // feel free to remove it :)
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        //await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Get the returned users and update the state.
         setUsers(response.data);
@@ -66,6 +76,8 @@ const Game = () => {
         console.error(`Something went wrong while fetching the users: \n${handleError(error)}`);
         console.error("Details:", error);
         alert("Something went wrong while fetching the users! See the console for details.");
+
+        history.push('/login');
       }
     }
 
@@ -74,33 +86,35 @@ const Game = () => {
 
   let content = <Spinner/>;
 
-  if (users) {
-    content = (
-      <div className="game">
-        <ul className="game user-list">
-          {users.map(user => (
-            <Player user={user} key={user.id}/>
-          ))}
-        </ul>
-        <Button
-          width="100%"
-          onClick={() => logout()}
-        >
-          Logout
-        </Button>
-      </div>
-    );
-  }
+    if (users) {
+        content = (
+            <div className="game">
+                <UserList className="game user-list">
+                    {users.map(user => {
+                        return (
+
+                            <Link to = {'/game/user/' + user.userID}>
+                                <Player user={user} key={user.userID}/>
+                            </Link>
+                        );
+                    })}
+                </UserList>
+                <Button
+                    width="100%"
+                    onClick={() => logout()}
+                >
+                    Logout
+                </Button>
+            </div>
+        );
+    }
 
   return (
     <BaseContainer className="game container">
-      <h2>Happy Coding!</h2>
-      <p className="game paragraph">
-        Get all users from secure endpoint:
-      </p>
       {content}
     </BaseContainer>
   );
 }
+
 
 export default Game;

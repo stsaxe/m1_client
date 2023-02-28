@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+ import React, {useState} from 'react';
 import {api, handleError} from 'helpers/api';
 import User from 'models/User';
 import {useHistory} from 'react-router-dom';
 import {Button} from 'components/ui/Button';
-import 'styles/views/Login.scss';
-//import 'styles/views/Switch.scss';
+import 'styles/views/Register.scss';
+import 'styles/views/Switch.scss';
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import {Link} from 'react-router-dom'
@@ -17,12 +17,12 @@ specific components that belong to the main one in the same file.
  */
 const FormField = props => {
   return (
-    <div className="login field">
-      <label className="login label">
+    <div className="register field">
+      <label className="register label">
         {props.label}
       </label>
       <input
-        className="login input"
+        className="register input"
         placeholder="enter here.."
         value={props.value}
         onChange={e => props.onChange(e.target.value)}
@@ -37,20 +37,20 @@ FormField.propTypes = {
   onChange: PropTypes.func
 };
 
-const Login = props => {
+const Register = props => {
   const history = useHistory();
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
 
-  const doLogin = async () => {
+  const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({username, password});
-      const response = await api.post('/users/login', requestBody);
+      const response = await api.post('/users', requestBody);
 
       // Get the returned user and update a new object.
       const user = new User(response.data);
 
-      // Store the token, id and username into the local storage.
+      // Store the token, userID and username into the local storage.
       localStorage.setItem('token', user.token);
       localStorage.setItem('userID', user.userID);
       localStorage.setItem('username', user.username);
@@ -61,14 +61,14 @@ const Login = props => {
       // Login successfully worked --> navigate to the route /overview in the OverviewRouter
       history.push(`/game`);
     } catch (error) {
-      alert(`Something went wrong during the login: \n${handleError(error)}`);
+      alert(`Something went wrong during the register: \n${handleError(error)}`);
     }
   }
 
   return (
     <BaseContainer>
-      <div className="login container">
-        <div className="login form">
+      <div className="register container">
+        <div className="register form">
           <FormField
             label="Username"
             value={username}
@@ -79,34 +79,18 @@ const Login = props => {
             value={password}
              onChange={n => setPassword(n)}
           />
-          <div className="login button-container">
+          <div className="register button-container">
             <Button
               disabled={!username || !password}
               width="100%"
-              onClick={() => doLogin()}
+              onClick={() => doRegister()}
             >
-              Login
+              Register
             </Button>
           </div>
         </div>
-        </div>
-        <div className="switch container">
-          <div className="switch form">
-          <div className= "switch label">
-          </div>
-            <div className="switch button-container">
-              <Link to="/register">
-                <Button
-                  width="100%"
-                >
-                  Register
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
+      </div>
     </BaseContainer>
-    
 
 
 
@@ -118,4 +102,4 @@ const Login = props => {
  * You can get access to the history object's properties via the withRouter.
  * withRouter will pass updated match, location, and history props to the wrapped component whenever it renders.
  */
-export default Login;
+export default Register;
