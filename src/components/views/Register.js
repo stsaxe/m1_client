@@ -4,7 +4,7 @@ import User from 'models/User';
 import {useHistory} from 'react-router-dom';
 import {Button} from 'components/ui/Button';
 import 'styles/views/Register.scss';
-//import 'styles/views/Switch.scss';
+import 'styles/views/Switch.scss';
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import {Link} from 'react-router-dom'
